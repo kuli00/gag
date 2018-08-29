@@ -1,0 +1,44 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-8">
+            {% for meme in memes %}
+                <div class="meme">
+                    <div class="meme-title">
+                        <a href="{{ url("meme_details", {"id" : meme.id}) }}">{{ meme.title }}</a>
+                    </div>
+                    <div class="meme-image">
+                        <a href="{{ url("meme_details", {"id" : meme.id}) }}">
+                            <img
+                                    src="{{ meme.image }}"
+                                    alt="{{ meme.title }}"
+                                    class="meme-image"
+                            />
+                        </a>
+                    </div>
+                    <div class="meme-footer">
+                        <div class="meme-votes">
+                            <div class="float-left">
+                                <form name="form" method="post" action="/vote/up/{{ meme.id }}">
+                                    <button type="submit" id="form_submit" name="form[submit]" class="btn-success btn-upvote btn">+</button>
+                                </form>
+                            </div>
+
+                            <div class="float-left">
+                                <form name="form" method="post" action="/vote/down/{{ meme.id }}">
+                                    <button type="submit" id="form_submit" name="form[submit]" class="btn-danger btn-upvote btn">-</button>
+                                </form>
+                            </div>
+
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="float-left">
+                            Ocena: {{ meme.upVotes - meme.downVotes }}
+                        </div>
+                        Dodał: {{ meme.user }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

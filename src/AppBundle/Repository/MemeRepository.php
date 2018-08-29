@@ -69,4 +69,18 @@ class MemeRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("status", $status)
             ->getSingleScalarResult();
     }
+
+    /**
+     * @return array
+     */
+    public function findTop()
+    {
+        return $this->createQueryBuilder("m")
+            ->where("m.status = :status")
+            ->setParameter("status", Meme::STATUS_HOT)
+            ->orderBy("m.votesRate", "DESC")
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
 }

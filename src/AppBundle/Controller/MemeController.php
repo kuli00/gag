@@ -183,6 +183,25 @@ class MemeController extends Controller
     }
 
     /**
+     * @Route("/top10/", name="meme_top")
+     * @return Response
+     */
+    public function topAction()
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $memes = $entityManager
+            ->getRepository(Meme::class)
+            ->findTop();
+
+        return $this->render("Meme/top.html.twig",
+            [
+                "memes" => $memes,
+                "activeMenuElement" => "top",
+            ]
+        );
+    }
+
+    /**
      * @Route("/vote/up/{id}", name="meme_upvote")
      * @param Meme $meme
      * @return \Symfony\Component\HttpFoundation\RedirectResponse

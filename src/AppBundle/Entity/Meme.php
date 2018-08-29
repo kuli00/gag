@@ -77,6 +77,12 @@ class Meme
      */
     private $downVotes;
 
+    /**
+     * @var int
+     * @ORM\Column(name="votesRate", type="integer")
+     */
+    private $votesRate;
+
 
     /**
      * Get id
@@ -258,6 +264,34 @@ class Meme
     {
         $this->downVotes += 1;
         return $this->downVotes;
+    }
+
+    /**
+     * @param $votesRate
+     * @return $this
+     */
+    public function setVotesRate($votesRate)
+    {
+        $this->votesRate = $votesRate;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getVotesRate()
+    {
+        return $this->votesRate;
+    }
+
+    /**
+     * @return $this
+     */
+    public function updateVotesRate()
+    {
+        $votesRate = $this->getUpVotes() - $this->getDownVotes();
+        $this->setVotesRate($votesRate);
+        return $this;
     }
 }
 
