@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}
+            <link rel="stylesheet" type="text/css" href="{{ asset('build/app.css') }}" />
+            <link rel="stylesheet" type="text/css" href="{{ asset('css/style.css') }}" />
+        {% endblock %}
+    </head>
+    <body>
+        <div class="container">
+            {% include ("navigation.html.twig") %}
+            {% include ("header.html.twig") %}
+            <hr>
+            {% for message in app.flashes("error") %}
+                <div class="alert alert-danger" role="alert">{{ message }}</div>
+            {% endfor %}
+            {% block body %}
+            {% endblock %}
+            <hr>
+            {% include ("footer.html.twig") %}
+        </div>
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

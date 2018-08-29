@@ -1,0 +1,102 @@
+body {
+
+}
+
+.main-nav {
+    text-align: center;
+}
+
+.main-header {
+
+}
+
+.footer {
+    text-align: center;
+}
+
+.meme{
+    display: block;
+    border: solid 1px #000;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    margin: 10px 0 10px 0;
+}
+
+.meme-title {
+    font-size: 18px;
+    font-weight: bold;
+    display: block;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.meme-title a {
+    color: #000;
+}
+
+.meme-title a:hover {
+    color: #5eb5e0;
+    text-decoration: none;
+}
+
+.meme-image {
+    width: 90%;
+    display: block;
+    margin: 0 auto;
+}
+
+.meme-footer {
+    text-align: right;
+    display: block;
+    margin: 10px 10px 0 0;
+}
+
+.meme-comments-section {
+    border: 1px solid #000;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.meme-comment-add {
+    margin: 0 auto;
+    width: 90%
+}
+
+.meme-comment-add input[type=submit] {
+    margin: 10px 0;
+}
+
+.meme-comment {
+    background-color: #eff5ff;
+    border-radius: 5px;
+    margin: 5px auto;
+    width: 90%;
+    padding: 10px;
+}
+
+.meme-comment-header {
+    display: block;
+    font-size: smaller;
+}
+
+.meme-comment-author {
+    display: inline-block;
+}
+
+.meme-comment-createdAt {
+    display: inline-block;
+}
+
+.meme-comment-content {
+
+}
+
+.btn-upvote, .btn-downvote{
+    width: 50px;
+    height: 50px;
+    font-size: 30px;
+    padding-top: 0;
+    display: inline-block;
+    margin: 5px;
+}

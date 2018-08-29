@@ -1,0 +1,28 @@
+<div class="main-nav">
+    <ul class="nav nav-tabs nav-fill">
+        <li class="nav-item">
+            <a class="nav-link {% if activeMenuElement == "hot" %}active{% endif %}" href="{{ url("meme_index") }}">Strona główna</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if activeMenuElement == "fresh" %}active{% endif %}" href="{{ url("meme_fresh") }}/1">Poczekalnia</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Top 10</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url("meme_random") }}">Losuj</a>
+        </li>
+        {% if is_granted("ROLE_USER") %}
+            <li class="nav-item">
+                <a class="nav-link {% if activeMenuElement == "add" %}active{% endif %}" href="{{ url("meme_add") }}">Dodaj</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url("fos_user_security_logout") }}">Wyloguj</a>
+            </li>
+        {% else %}
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url("fos_user_security_login") }}">Zaloguj</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>

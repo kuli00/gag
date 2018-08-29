@@ -1,0 +1,74 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <div class="meme">
+                <div class="meme-title">
+                    <a href="{{ url("meme_details", {"id" : meme.id}) }}">{{ meme.title }}</a>
+                </div>
+                <div class="meme-image">
+                    <a href="{{ url("meme_details", {"id" : meme.id}) }}">
+                        <img
+                                src="{{ meme.image }}"
+                                alt="{{ meme.title }}"
+                                class="meme-image"
+                        />
+                    </a>
+                </div>
+                <div class="meme-footer">
+                    <div class="meme-votes">
+                        <div class="float-left">
+                            {{ form_start(upvoteForm) }}
+                                {{ form_widget(upvoteForm.submit) }}
+                                {{ form_rest(upvoteForm) }}
+                            {{ form_end(upvoteForm) }}
+                        </div>
+
+                        <div class="float-left">
+                            {{ form_start(downvoteForm) }}
+                                {{ form_widget(downvoteForm.submit) }}
+                                {{ form_rest(downvoteForm) }}
+                            {{ form_end(downvoteForm) }}
+                        </div>
+
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="float-left">
+                        Ocena: {{ meme.upVotes - meme.downVotes }}
+                    </div>
+                    Dodał: {{ meme.user }}
+                </div>
+            </div>
+            <div class="meme-comments-section">
+                <h3>Komentarze</h3>
+                <div class="meme-comment-add">
+                    {% if is_granted("ROLE_USER") %}
+                        {{ form_start(commentForm) }}
+                        {{ form_widget(commentForm.content, {"attr": {"placeholder" : "Treść komentarza"}}) }}
+                        {{ form_widget(commentForm.submit, {"attr": {"class": "btn-success float-right"}}) }}
+                        {{ form_end(commentForm) }}
+                    {% else %}
+                        Musisz być <a href="{{ url("fos_user_security_login") }}">zalogowany</a> aby dodawać komentarze</h5>
+                    {% endif %}
+                </div>
+                <div class="clearfix"></div>
+                <hr>
+                {% if meme.comments|length != 0 %}
+                    {% for comment in meme.comments %}
+                        <div class="meme-comment">
+                            <div class="meme-comment-header">
+                                <div class="meme-comment-author">Autor: {{ comment.user }}</div>
+                                <div class="meme-comment-createdAt">{{ comment.createdAt|date("d.m.Y H:i") }}</div>
+                            </div>
+                            <div class="meme-comment-content">
+                                {{ comment.content }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <h5>Brak komentarzy</h5>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
