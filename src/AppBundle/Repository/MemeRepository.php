@@ -108,6 +108,8 @@ class MemeRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("hotrate", 20)
             ->andWhere("m.createdAt < :datetime")
             ->setParameter("datetime", new \DateTime("-7 days") )
+            ->andWhere("m.status = :status")
+            ->setParameter("status", Meme::STATUS_FRESH)
             ->getQuery()
             ->getResult();
 

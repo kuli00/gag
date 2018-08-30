@@ -20,7 +20,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class MemeController extends Controller
 {
     /**
-     * @Route("/{page}", name="meme_index")
+     * @Route("/", name="meme_index")
+     * @Route("/page/{page}", name="meme_page")
      * @param int $page
      * @return Response
      * @throws \Doctrine\ORM\NoResultException
@@ -28,6 +29,7 @@ class MemeController extends Controller
      */
     public function indexAction($page = 1)
     {
+        if(!isset($page)) $page = 1;
         $entityManager = $this->getDoctrine()->getManager();
         $memes = $entityManager
             ->getRepository(Meme::class)
@@ -101,6 +103,7 @@ class MemeController extends Controller
                     ->setUser($this->getUser())
                     ->setImage($base64)
                     ->setCreatedAt(new \DateTime())
+                    ->setVotesRate(0)
                     ->setUpVotes()
                     ->setDownVotes();
 
@@ -212,6 +215,7 @@ class MemeController extends Controller
             $this->denyAccessUnlessGranted("ROLE_USER");
             $entityManager = $this->getDoctrine()->getManager();
             $meme->addUpVotes();
+            $meme->updateVotesRate();
             $entityManager->persist($meme);
             $entityManager->flush();
             return $this->redirectToRoute("meme_details", ["id" => $meme->getId()]);
@@ -233,6 +237,7 @@ class MemeController extends Controller
             $this->denyAccessUnlessGranted("ROLE_USER");
             $entityManager = $this->getDoctrine()->getManager();
             $meme->addDownVotes();
+            $meme->updateVotesRate();
             $entityManager->persist($meme);
             $entityManager->flush();
             return $this->redirectToRoute("meme_details", ["id" => $meme->getId()]);
