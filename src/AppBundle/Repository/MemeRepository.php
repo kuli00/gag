@@ -83,4 +83,44 @@ class MemeRepository extends \Doctrine\ORM\EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return mixed
+     */
+    public function findWrongStatus()
+    {
+        $wrongStatus = array(
+            'freshToHot' => NULL,
+            'freshExpired' => NULL,
+            'freshLowRate' => NULL,
+        );
+
+        $wrongStatus['freshToHot'] = $this->createQueryBuilder("m")
+            ->where("m.votesRate > :hotrate")
+            ->setParameter("hotrate", 20)
+            ->andWhere("m.status = :status")
+            ->setParameter("status", Meme::STATUS_FRESH)
+            ->getQuery()
+            ->getResult();
+
+        $wrongStatus['freshExpired'] = $this->createQueryBuilder("m")
+            ->where("m.votesRate < :hotrate")
+            ->setParameter("hotrate", 20)
+            ->andWhere("m.createdAt < :datetime")
+            ->setParameter("datetime", new \DateTime("-7 days") )
+            ->getQuery()
+            ->getResult();
+
+        $wrongStatus['freshLowRate'] = $this->createQueryBuilder("m")
+            ->where("m.votesRate < :archiverate")
+            ->setParameter("archiverate", -10)
+            ->getQuery()
+            ->getResult();
+
+        return $wrongStatus;
+
+
+
+
+    }
 }

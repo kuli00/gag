@@ -129,7 +129,7 @@ class Meme
     }
 
     /**
-     * @return BlobType
+     * @return string
      */
     public function getImage()
     {
