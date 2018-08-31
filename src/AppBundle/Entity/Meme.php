@@ -241,6 +241,15 @@ class Meme
     }
 
     /**
+     * @return int
+     */
+    public function subUpVotes()
+    {
+        $this->upVotes -= 1;
+        return $this->upVotes;
+    }
+
+    /**
      * @return $this
      */
     public function setDownVotes()
@@ -266,6 +275,14 @@ class Meme
         return $this->downVotes;
     }
 
+    /**
+     * @return int
+     */
+    public function subDownVotes()
+    {
+        $this->downVotes -= 1;
+        return $this->downVotes;
+    }
     /**
      * @param $votesRate
      * @return $this

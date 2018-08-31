@@ -30,10 +30,9 @@ class CommentController extends Controller
      * @Route("/comment/add/{id}", name="comment_add", methods={"POST"})
      * @param Request $request
      * @param Meme $meme
-     * @param User $user
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function addAction(Request $request, Meme $meme, User $user)
+    public function addAction(Request $request, Meme $meme)
     {
         $this->denyAccessUnlessGranted("ROLE_USER");
 
@@ -47,7 +46,7 @@ class CommentController extends Controller
             $comment
                 ->setCreatedAt(new \DateTime())
                 ->setMeme($meme)
-                ->setUser($user);
+                ->setUser($this->getUser());
 
             $entityManager->persist($comment);
             $entityManager->flush();

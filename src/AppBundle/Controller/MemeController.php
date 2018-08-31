@@ -9,6 +9,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Meme;
+use AppBundle\Entity\User;
 use AppBundle\Form\CommentType;
 use AppBundle\Form\MemeType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -29,7 +30,6 @@ class MemeController extends Controller
      */
     public function indexAction($page = 1)
     {
-        if(!isset($page)) $page = 1;
         $entityManager = $this->getDoctrine()->getManager();
         $memes = $entityManager
             ->getRepository(Meme::class)
@@ -37,14 +37,18 @@ class MemeController extends Controller
         $memesCount = $entityManager
             ->getRepository(Meme::class)
             ->findMaxPages(Meme::STATUS_HOT);
+        $pagination = $entityManager
+            ->getRepository(Meme::class)
+            ->pagination(Meme::STATUS_HOT, $page);
         return $this
             ->render(
                 "Meme/index.html.twig",
                 [
                     "memes" => $memes,
-                    "maxPage" => intval(ceil($memesCount / 10)),
+                    "pagination" => $pagination,
                     "currentPage" => $page,
                     "activeMenuElement" => "hot",
+                    "maxPage" => $memesCount,
                 ]
             );
     }
@@ -66,14 +70,18 @@ class MemeController extends Controller
         $memesCount = $entityManager
             ->getRepository(Meme::class)
             ->findMaxPages(Meme::STATUS_FRESH);
+        $pagination = $entityManager
+            ->getRepository(Meme::class)
+            ->pagination(Meme::STATUS_FRESH, $page);
         return $this
             ->render(
                 "Meme/fresh.html.twig",
                 [
                     "memes" => $memes,
-                    "maxPage" => intval(ceil($memesCount / 10)),
+                    "maxPage" => $memesCount,
                     "currentPage" => $page,
                     "activeMenuElement" => "fresh",
+                    "pagination" => $pagination,
                 ]
             );
     }
@@ -129,7 +137,6 @@ class MemeController extends Controller
      */
     public function detailsAction(Meme $meme)
     {
-
         $commentForm = $this->createForm(
             CommentType::class,
             null,
@@ -211,12 +218,37 @@ class MemeController extends Controller
      */
     public function upvoteAction(Meme $meme)
     {
-        if($this->getUser() != NULL) {
+        $user = $this->getUser();
+        if($user != NULL) {
             $this->denyAccessUnlessGranted("ROLE_USER");
+            $newVote = TRUE;
+            $userVotes = $user->getVotes();
             $entityManager = $this->getDoctrine()->getManager();
+
+            foreach ($userVotes AS $key => $userVote)
+            {
+                if($userVote["id"] == $meme->getId() && $userVote["vote"] == "+") {
+                    $this->addFlash("error", "Możesz zagłosować tylko raz");
+                    return $this->redirectToRoute("meme_details", ["id" => $meme->getId()]);
+                }
+                elseif ($userVote["id"] == $meme->getId() && $userVote["vote"] == "-") {
+                    $meme->subDownVotes();
+                    $userVotes[$key]["vote"] = "+";
+                    $newVote = FALSE;
+                }
+            }
+
+            if ($newVote) {
+                $i = count($userVotes);
+                $userVotes[$i]["id"] = $meme->getId();
+                $userVotes[$i]["vote"] = "+";
+            }
+
+            $user->setVotes($userVotes);
             $meme->addUpVotes();
             $meme->updateVotesRate();
             $entityManager->persist($meme);
+            $entityManager->persist($user);
             $entityManager->flush();
             return $this->redirectToRoute("meme_details", ["id" => $meme->getId()]);
         }
@@ -233,12 +265,37 @@ class MemeController extends Controller
      */
     public function downvoteAction(Meme $meme)
     {
-        if($this->getUser() != NULL) {
+        $user = $this->getUser();
+        if($user != NULL) {
             $this->denyAccessUnlessGranted("ROLE_USER");
             $entityManager = $this->getDoctrine()->getManager();
+            $newVote = TRUE;
+            $userVotes = $user->getVotes();
+
+            foreach ($userVotes AS $key => $userVote )
+            {
+                if($userVote["id"] == $meme->getId() && $userVote["vote"] == "-") {
+                    $this->addFlash("error", "Możesz zagłosować tylko raz");
+                    return $this->redirectToRoute("meme_details", ["id" => $meme->getId()]);
+                }
+                elseif ($userVote["id"] == $meme->getId() && $userVote["vote"] == "+") {
+                    $meme->subUpVotes();
+                    $userVotes[$key]["vote"] = "-";
+                    $newVote = FALSE;
+                }
+            }
+
+            if ($newVote) {
+                $i = count($userVotes);
+                $userVotes[$i]["id"] = $meme->getId();
+                $userVotes[$i]["vote"] = "-";
+            }
+
+            $user->setVotes($userVotes);
             $meme->addDownVotes();
             $meme->updateVotesRate();
             $entityManager->persist($meme);
+            $entityManager->persist($user);
             $entityManager->flush();
             return $this->redirectToRoute("meme_details", ["id" => $meme->getId()]);
         }

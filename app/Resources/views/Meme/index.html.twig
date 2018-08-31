@@ -51,8 +51,8 @@
             <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center">
                     {% if maxPage > 0 %}
-                        {% for i in 1..maxPage %}
-                            <li class="page-item {% if i == currentPage %}active{% endif %}"><a class="page-link" href="/page/{{ i }}">{{ i }}</a></li>
+                        {% for page in pagination %}
+                            <li class="page-item {% if page == currentPage %}active{% endif %}"><a class="page-link" href="/page/{{ page }}">{{ page }}</a></li>
                         {% endfor %}
                     {% endif %}
                 </ul>

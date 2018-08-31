@@ -54,13 +54,38 @@ class MemeRepository extends \Doctrine\ORM\EntityRepository
 
     /**
      * @param $status
+     * @param $page
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function pagination($status, $page)
+    {
+        $maxPage = $this->findMaxPages($status);
+        $pages = array();
+        if  ($maxPage <= 11) {
+            for ($i = 1; $i <= $maxPage; $i++) {
+                $pages[] = $i;
+            }
+        }
+        else {
+            for ($i = $page - 5; $i <= $page + 5; $i++) {
+                $pages[] = $i;
+            }
+        }
+        return $pages;
+
+    }
+
+    /**
+     * @param $status
      * @return mixed
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function findMaxPages($status)
     {
-        return $this->getEntityManager()
+        $memes = $this->getEntityManager()
             ->createQuery(
                 "SELECT COUNT(m.id) 
                 FROM AppBundle:Meme m 
@@ -68,6 +93,9 @@ class MemeRepository extends \Doctrine\ORM\EntityRepository
                 )
             ->setParameter("status", $status)
             ->getSingleScalarResult();
+        $memes /= 10;
+        return $memes = intval(ceil($memes));
+
     }
 
     /**
@@ -116,13 +144,11 @@ class MemeRepository extends \Doctrine\ORM\EntityRepository
         $wrongStatus['freshLowRate'] = $this->createQueryBuilder("m")
             ->where("m.votesRate < :archiverate")
             ->setParameter("archiverate", -10)
+            ->andWhere("m.status = :status")
+            ->setParameter("status", Meme::STATUS_FRESH)
             ->getQuery()
             ->getResult();
 
         return $wrongStatus;
-
-
-
-
     }
 }
