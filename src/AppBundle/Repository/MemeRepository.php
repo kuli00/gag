@@ -3,6 +3,7 @@
 namespace AppBundle\Repository;
 
 use AppBundle\Entity\Meme;
+use AppBundle\Entity\User;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 /**
@@ -53,15 +54,30 @@ class MemeRepository extends \Doctrine\ORM\EntityRepository
     }
 
     /**
-     * @param $status
-     * @param $page
+     * @param int $page
+     * @param $userId
      * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function pagination($status, $page)
+    public function findUserMemes($page = 1, $userId)
     {
-        $maxPage = $this->findMaxPages($status);
+        $page = $page * 10 - 10;
+        $query = $this->createQueryBuilder("m")
+            ->where("m.user = :user")
+            ->setParameter("user", $userId)
+            ->orderBy("m.createdAt", "DESC")
+            ->getQuery();
+        $query->setFirstResult($page);
+        $query->setMaxResults(10);
+        return $query->getResult();
+    }
+
+    /**
+     * @param $page
+     * @param $maxPage
+     * @return array
+     */
+    public function pagination($page, $maxPage)
+    {
         $pages = array();
         if  ($maxPage <= 11) {
             for ($i = 1; $i <= $maxPage; $i++) {
@@ -96,6 +112,26 @@ class MemeRepository extends \Doctrine\ORM\EntityRepository
         $memes /= 10;
         return $memes = intval(ceil($memes));
 
+    }
+
+    /**
+     * @param $userId
+     * @return int
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function countUserMemes($userId)
+    {
+        $memes = $this->getEntityManager()
+            ->createQuery(
+                "SELECT COUNT(m.id) 
+                FROM AppBundle:Meme m 
+                WHERE m.user = :user"
+            )
+            ->setParameter("user", $userId)
+            ->getSingleScalarResult();
+        $memes /= 10;
+        return $memes = intval(ceil($memes));
     }
 
     /**

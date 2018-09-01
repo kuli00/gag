@@ -12,9 +12,12 @@
         <li class="nav-item">
             <a class="nav-link" href="{{ url("meme_random") }}">Losuj</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {% if activeMenuElement == "add" %}active{% endif %}" href="{{ url("meme_add") }}">Dodaj</a>
+        </li>
         {% if is_granted("ROLE_USER") %}
             <li class="nav-item">
-                <a class="nav-link {% if activeMenuElement == "add" %}active{% endif %}" href="{{ url("meme_add") }}">Dodaj</a>
+                <a class="nav-link {% if activeMenuElement == "myMemes" %}active{% endif %}" href="{{ url("my_memes") }}">Moje konto</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url("fos_user_security_logout") }}">Wyloguj</a>

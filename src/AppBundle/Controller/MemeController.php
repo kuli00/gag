@@ -39,7 +39,7 @@ class MemeController extends Controller
             ->findMaxPages(Meme::STATUS_HOT);
         $pagination = $entityManager
             ->getRepository(Meme::class)
-            ->pagination(Meme::STATUS_HOT, $page);
+            ->pagination($page, $memesCount);
         return $this
             ->render(
                 "Meme/index.html.twig",
@@ -49,6 +49,7 @@ class MemeController extends Controller
                     "currentPage" => $page,
                     "activeMenuElement" => "hot",
                     "maxPage" => $memesCount,
+                    "status" => "page",
                 ]
             );
     }
@@ -72,16 +73,51 @@ class MemeController extends Controller
             ->findMaxPages(Meme::STATUS_FRESH);
         $pagination = $entityManager
             ->getRepository(Meme::class)
-            ->pagination(Meme::STATUS_FRESH, $page);
+            ->pagination($page, $memesCount);
         return $this
             ->render(
-                "Meme/fresh.html.twig",
+                "Meme/index.html.twig",
                 [
                     "memes" => $memes,
                     "maxPage" => $memesCount,
                     "currentPage" => $page,
                     "activeMenuElement" => "fresh",
                     "pagination" => $pagination,
+                    "status" => "fresh",
+                ]
+            );
+    }
+
+    /**
+     * @Route("/myMemes/{page}", name="my_memes")
+     * @param int $page
+     * @return Response
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function myMemesAction($page = 1)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $user = $this->getUser();
+        $memes = $entityManager
+            ->getRepository(Meme::class)
+            ->findUserMemes($page, $this->getUser()->getId());
+        $memesCount = $entityManager
+            ->getRepository(Meme::class)
+            ->countUserMemes($user->getId());
+        $pagination = $entityManager
+            ->getRepository(Meme::class)
+            ->pagination($page, $memesCount);
+        return $this
+            ->render(
+                "Meme/index.html.twig",
+                [
+                    "memes" => $memes,
+                    "maxPage" => $memesCount,
+                    "currentPage" => $page,
+                    "activeMenuElement" => "myMemes",
+                    "pagination" => $pagination,
+                    "status" => "myMemes",
                 ]
             );
     }
@@ -221,6 +257,10 @@ class MemeController extends Controller
         $user = $this->getUser();
         if($user != NULL) {
             $this->denyAccessUnlessGranted("ROLE_USER");
+            if ($meme->getUser() == $user) {
+                $this->addFlash("error", "Nie możesz głosować na swoje obrazki");
+                return $this->redirectToRoute("meme_details", ["id" => $meme->getId()]);
+            }
             $newVote = TRUE;
             $userVotes = $user->getVotes();
             $entityManager = $this->getDoctrine()->getManager();
@@ -268,6 +308,10 @@ class MemeController extends Controller
         $user = $this->getUser();
         if($user != NULL) {
             $this->denyAccessUnlessGranted("ROLE_USER");
+            if ($meme->getUser() == $user) {
+                $this->addFlash("error", "Nie możesz głosować na swoje obrazki");
+                return $this->redirectToRoute("meme_details", ["id" => $meme->getId()]);
+            }
             $entityManager = $this->getDoctrine()->getManager();
             $newVote = TRUE;
             $userVotes = $user->getVotes();
